@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QueryScope — watch your SQL actually run</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+         margin: 0; padding: 40px 18px 56px; background: #0f1420; color: #e8ecf4; }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  h1 { font-size: 34px; margin: 0; }
+  .tag { color: #9aa7bd; font-size: 16px; margin-top: 8px; line-height: 1.6; }
+  .tag b { color: #e8ecf4; }
+  h2 { font-size: 19px; margin: 34px 0 12px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  a.card { display: block; background: #161d2e; border: 1px solid #2a3550; border-radius: 12px;
+           padding: 16px; color: #e8ecf4; text-decoration: none; transition: border-color .2s; }
+  a.card:hover { border-color: #f5b83d; }
+  .card .t { font-weight: 700; font-size: 15.5px; }
+  .card .d { color: #9aa7bd; font-size: 13.5px; line-height: 1.55; margin-top: 6px; }
+  .card .go { color: #f5b83d; font-size: 13px; font-weight: 700; margin-top: 10px; }
+  ul { line-height: 1.9; font-size: 15px; padding-left: 20px; }
+  code { background: #161d2e; border: 1px solid #2a3550; border-radius: 6px; padding: 1px 6px;
+         font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13.5px; }
+  .foot { margin-top: 40px; color: #9aa7bd; font-size: 13.5px; line-height: 1.7; }
+  .foot a { color: #f5b83d; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>QueryScope</h1>
+  <div class="tag">Everyone reads a query top to bottom: SELECT first. No engine runs it that way.
+  QueryScope rebuilds a query's <b>logical execution order</b>, explains each step in plain
+  English, flags the expensive patterns, and animates the whole thing.
+  <b>Pick an example and press play.</b></div>
+
+  <h2>Live examples</h2>
+  <div class="cards">
+    <a class="card" href="examples/rent_by_property.html">
+      <div class="t">Rent by property</div>
+      <div class="d">Joins first, filter after, and a COUNT(DISTINCT) hiding in the SELECT that most people never cost out.</div>
+      <div class="go">Watch it run &rarr;</div>
+    </a>
+    <a class="card" href="examples/top_properties.html">
+      <div class="t">Top properties (the stress test)</div>
+      <div class="d">Two CTEs, RANK and LAG window functions, a scalar subquery, and a GROUP BY stacked on an already grouped grain.</div>
+      <div class="go">Watch it run &rarr;</div>
+    </a>
+    <a class="card" href="examples/event_feed.html">
+      <div class="t">The harmless looking one</div>
+      <div class="d">Wildcard select, a YEAR() wrapped around the filter column, and a sort with no LIMIT. Looks fine. Is not.</div>
+      <div class="go">Watch it run &rarr;</div>
+    </a>
+    <a class="card" href="examples/signups_by_channel.html">
+      <div class="t">The clean case</div>
+      <div class="d">One table, one filter, one grouping. QueryScope stays quiet, which matters just as much.</div>
+      <div class="go">Watch it run &rarr;</div>
+    </a>
+  </div>
+
+  <h2>What it catches</h2>
+  <ul>
+    <li><b>DISTINCT aggregates</b> — <code>COUNT(DISTINCT x)</code> forces its own distinct pass over the grouped rows.</li>
+    <li><b>Function-wrapped filter columns</b> — <code>WHERE YEAR(created_at) = 2026</code> defeats index range scans.</li>
+    <li><b>Wildcard selects, condition-less joins, sorts with no LIMIT</b>, filters that arrive after the joins.</li>
+    <li><b>Window functions and scalar subqueries</b>, including the ones hiding inside CTEs.</li>
+  </ul>
+
+  <div class="foot">
+    Run it yourself: <code>python -m queryscope your_query.sql</code> — any dialect sqlglot speaks
+    (Snowflake, BigQuery, DuckDB, Postgres, Spark, and more).<br>
+    Source and README: <a href="https://github.com/pawan8080/queryscope">github.com/pawan8080/queryscope</a>.
+    Built by Pawan Patel.
+  </div>
+</div>
+</body>
+</html>
