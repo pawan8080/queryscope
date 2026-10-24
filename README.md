@@ -2,6 +2,8 @@
 
 **Watch your SQL run in the order the engine actually executes it.**
 
+![QueryScope replaying a complex query in true execution order, step by step](docs/demo.gif)
+
 Everyone reads a query top to bottom: SELECT first, then FROM, then WHERE.
 That is not the order any engine runs it in. The engine starts at FROM,
 joins, filters, groups — and only near the end evaluates the SELECT list
